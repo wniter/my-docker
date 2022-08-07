@@ -1,0 +1,54 @@
+version: "3"
+
+
+
+services:
+  # Service for nameserver
+  namesrv:
+    image: apacherocketmq/rocketmq:4.5.0      # 官方镜像
+    container_name: rmqnamesrv
+    ports:
+      - 9876:9876
+    volumes:
+      # 本地目录:指定一个容器内的路径，Docker会自动创建一个数据卷。
+      - /data/rocketmq/broker/logs:/home/rocketmq/rocketmq-4.5.0/logs
+      - /data/rocketmq/broker/store:/home/rocketmq/rocketmq-4.5.0/store
+    command: sh mqnamesrv
+ 
+  # Service for broker
+  broker:
+    image: apacherocketmq/rocketmq:4.5.0      # 官方镜像
+    container_name: rmqbroker
+    links:
+      - namesrv
+    ports:
+      - 10909:10909
+      - 10911:10911
+      - 10912:10912
+    volumes:
+       # 本地目录:指定一个容器内的路径，Docker会自动创建一个数据卷。
+      - /data/rocketmq/broker/logs:/home/rocketmq/rocketmq-4.5.0/logs
+      - /data/rocketmq/broker/store:/home/rocketmq/rocketmq-4.5.0/store
+      - /data/rocketmq/config/broker.conf:/home/rocketmq/rocketmq-4.5.0/conf/broker.conf
+    command: 
+      - sh mqbroker -n namesrv:9876 -c /home/rocketmq/rocketmq-4.5.0/conf/broker.conf autoCreateTopicEnable=true   # 使用我们自己创建的broker.conf
+      - Dcom.rocketmq.sendMessageWithVIPChannel=false
+    environment:
+      - NAMESRV_ADDR=namesrv:9876
+      - JAVA_HOME=/usr/lib/jvm/jre             # Java home
+      # 启动 RocketMQ Server + Broker + Console 至少需要 2G 内存。但是我在文件里配置了
+      - JAVA_OPT_EXT=-server -Xms128m -Xmx128m -Xmn128m
+  
+ 
+  # rocketmq-console-ng
+  console:
+    image: apacherocketmq/rocketmq-console:2.0.0       # 官方镜像
+    container_name: rocketmq-console-ng
+    restart: always    
+    ports:
+      - 7100:8080                              # 映射端口：实际端口
+    depends_on:
+      - namesrv
+    environment:
+      - JAVA_OPTS=-Drocketmq.namesrv.addr=namesrv:9876
+      - Dcom.rocketmq.sendMessageWithVIPChannel=false
