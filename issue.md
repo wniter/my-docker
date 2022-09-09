@@ -15,17 +15,60 @@ redis-server /etc/redis/redis.conf：这个是关键配置，让redis不是无�
 -->
 2.卷volume是怎么映射的
 <!-- 
+    这个docker下的data路径要查，配置config路径也要查
     linux下：
+        自定路径：原路径
         - "/docker/apollo/logs/100003172:/opt/logs/100003172"
+    window下：
+        \\wsl$\docker-desktop-data\version-pack-data\community\docker\volumes\[VOLUME_ID]
+        #这个试试
+        \\wsl$\docker-desktop-data\data\docker\volumes
+    
  -->
 
 3.dockerfile和docker-compose的区别在哪里
 
+<!-- 
+    1.build可以直接启动dockerfile
+    # build:
+      # context: ./data/mysql
+      # 在dockerfile可以配置替换的配置，进行添加
+      # dockerfile: dockerfile
+
+    2.dockerfile可以直接部署开发单个jar包
+ -->
 4.dockerfile如何用.sh文件启动
+<!-- 
+    #!/bin/bash
 
-5.程序的jar包怎么一起做成docker-compose或者配置环境后怎么单独的运行
+# docker-compose文件目录
+DOCKER_COMPOSE_FILE=docker-compose.yml
+# DOCKER_COMPOSE_FILE=mysql-redis-docker-compose.yml
+# DOCKER_COMPOSE_FILE=rocketmq-docker-compose.yml
 
-6.镜像怎么制作
+# 生成镜像
+docker-compose build --no-cache
+# 启动docker-compose
+docker-compose up -d
+
+# 终端运行
+# docker-compose -f docker-compose.yml up -d
+ -->
+
+5.network ping通，容器之间相互通信
+
+<!-- 
+
+#配置 networkds
+networks:
+  network:
+    # name:
+    driver: bridge    
+参考链接：
+    https://docs.docker.com/config/containers/multi-service_container/
+    https://www.cnblogs.com/luo-c/p/15976956.html
+
+ -->
 
 
 

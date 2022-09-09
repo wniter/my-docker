@@ -14,17 +14,30 @@ services:
     # 容器名称，相当于docker run --name xxx， 里面的参数
     container_name: mysql5.7.39
     # 指定Dockerfile所在文件夹的路径，Compose将会利用Dockerfile自动构建镜像，然后启动镜像中的容器
-    build:
-      context: ./data/mysql
-      dockerfile: dockerfile
+    # build:
+      # context: ./data/mysql
+      # 在dockerfile可以配置替换的配置，进行添加
+      # dockerfile: dockerfile
     # 挂载一个目录或者一个已存在的数据卷容器
-    # ???
     volumes:
-      - /data/mysql/data:/var/lib/mysql5
-      - ./mysql/init:/docker-entrypoint-initdb.d/
+      - /etc/localtime:/etc/localtime:ro # 设置容器时区与宿主机保持一致
+      # - mysql:/var/lib/mysql/data #这个数据映射有问题
+      - /data/mysql/config/my.cnf:/etc/mysql/my.cnf # 映射数据库配置文件
     # 环境变量，相当于docker run -e xxx=xxx里面的-e参数
     environment:
+    # root
       - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_DATABASE=local
+      # - MYSQL_USER=roo
+      # - MYSQL_PASSWORD=123456
+      # PMA
+      # - PMA_ARBITRARY=1
+      # - PMA_HOST=mysql
+      # - PMA_PORT=3306
+      # - PMA_USER=root
+      # - PMA_PASSWORD=123456
+      - TZ=Asia/Shanghai # 设置容器时区与宿主机保持一致
+
       # 这个地方是路径
       # MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
     # 授予mysql服务对my_secret和my_other_secret机密的访问权限。my_other_secret被定义为外部机密。
@@ -34,29 +47,49 @@ services:
     #   - my_other_secret
     # 端口
     ports:
-      - "3306:3306"
+      - 3306:3306
     # 重启方式，相当于docker run --restart里面的--restart参数
     restart: always
     # 覆盖容器启动后默认执行的命令，相当于docker run xxx /bin/bash里面最后一段命令
     #   command: --default-authentication-plugin=mysql_native_password
-    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unic
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci # 设置utf8字符集
+    #网路
+    networks:
+      - network
 
   # redis镜像
   redis:
     image: redis:7.0
     container_name: redis7.0
-    build: ./data/redis
+    build: 
+      context: ./data/redis
+      dockerfile: dockerfile
     volumes:
-      - /data/redis:/data
+      - /etc/localtime:/etc/localtime:ro # 设置容器时区与宿主机保持一致
+      - redis:/data
+      # - /data/redis:/data #数据映射
+      #   - /docker/mysql-redis/redis.conf:/etc/redis.conf
     ports:
       - "6379:6379"
     restart: always
+        #网路
+    networks:
+      - network
 
-#  
+#  便于区分，不然会生成随机ID
 volumes:
   mysql:
-    #
-    # networks:
+  redis:
+
+#配置 networkds
+networks:
+  network:
+    # name:
+    driver: bridge    
+
+
+
+
 
 # secrets 敏感数据的存储，比如mysql的密码
 # secrets:

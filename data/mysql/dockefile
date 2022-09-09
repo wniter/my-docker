@@ -1,0 +1,5 @@
+FROM mysql:5.7
+# 字段参考连接
+
+# https://kalacloud.com/blog/how-to-edit-mysql-configuration-file-my-cnf-ini/
+ADD /config/mysqld.cnf /etc/mysql/mysql.conf.d/mysqld.cnf
