@@ -14,6 +14,10 @@ redis-server /etc/redis/redis.conf：这个是关键配置，让redis不是无�
 –appendonly yes：redis启动后数据持久化
 -->
 2.卷volume是怎么映射的
+<!-- 
+    linux下：
+        - "/docker/apollo/logs/100003172:/opt/logs/100003172"
+ -->
 
 3.dockerfile和docker-compose的区别在哪里
 
@@ -26,3 +30,4 @@ redis-server /etc/redis/redis.conf：这个是关键配置，让redis不是无�
 
 
 https://juejin.cn/post/7011721238892675102
+
