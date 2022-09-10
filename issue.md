@@ -70,6 +70,9 @@ networks:
 
  -->
 
+6. docker mysql 中如何用脚本导入sql文件
+
+
 
 
 https://juejin.cn/post/7011721238892675102
