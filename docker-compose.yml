@@ -76,6 +76,11 @@ services:
     networks:
       - network
 
+
+
+
+
+
 #  便于区分，不然会生成随机ID
 volumes:
   mysql:
